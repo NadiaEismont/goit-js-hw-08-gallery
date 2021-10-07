@@ -1,3 +1,4 @@
+import { refs } from './refs'
 const galleryItems = [{
         preview: 'https://cdn.pixabay.com/photo/2019/05/14/16/43/himilayan-blue-poppy-4202825__340.jpg',
         original: 'https://cdn.pixabay.com/photo/2019/05/14/16/43/himilayan-blue-poppy-4202825_1280.jpg',
@@ -45,7 +46,7 @@ const galleryItems = [{
     },
 ];
 
-const tagUl = document.querySelector('.js-gallery');
+const tagUl = refs.gallery; //document.querySelector('.js-gallery');
 const getTemplate = item =>
     `<li class="gallery__item">
 <a
@@ -67,3 +68,58 @@ function createListItemsMarkup(items) {
 
 
 tagUl.insertAdjacentHTML('afterbegin', createListItemsMarkup(galleryItems));
+
+refs.gallery.addEventListener('click', onOpenModal);
+refs.backdrop.addEventListener('click', onBackdrop);
+refs.preview.addEventListener('click', onBackdrop);
+
+function onBackdrop(evt) {
+    if (evt.currentTarget === evt.target) {
+        onCloseModal();
+    }
+}
+
+function onOpenModal(evt) {
+    evt.preventDefault();
+    refs.lightbox.classList.add('is-open');
+    refs.preview.src = evt.target.dataset.source;
+    refs.preview.alt = evt.target.alt;
+
+    window.addEventListener('keydown', onEscKeyPress);
+    refs.gallery.addEventListener('keydown', onArrowPress);
+
+    refs.buttonModalClose.addEventListener('click', onCloseModal, { once: true });
+}
+
+function onCloseModal() {
+    window.removeEventListener('keydown', onEscKeyPress);
+    refs.lightbox.classList.remove('is-open');
+    refs.preview.src = '';
+    refs.preview.alt = '';
+}
+
+
+
+function onEscKeyPress(evt) {
+    if (evt.code === 'Escape') {
+        onCloseModal();
+    }
+
+}
+
+
+function onArrowPress(evt) {
+    let currentImage = galleryItems.findIndex(image => image.original === refs.preview.src);
+    if (evt.code === 'ArrowRight') {
+
+        currentImage = currentImage < galleryItems.length - 1 ? (currentImage + 1) : 0;
+    }
+
+    if (evt.code === 'ArrowLeft') {
+
+        currentImage = currentImage > 0 ? (currentImage - 1) : galleryItems.length - 1;
+    }
+
+    refs.preview.src = galleryItems[currentImage].original;
+    refs.preview.alt = galleryItems[currentImage].alt;
+};
