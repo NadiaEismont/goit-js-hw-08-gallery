@@ -80,6 +80,9 @@ function onBackdrop(evt) {
 }
 
 function onOpenModal(evt) {
+    if (evt.currentTarget === evt.target) {
+        return;
+    }
     evt.preventDefault();
     refs.lightbox.classList.add('is-open');
     refs.preview.src = evt.target.dataset.source;
